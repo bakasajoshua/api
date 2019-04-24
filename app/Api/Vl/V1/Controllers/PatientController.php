@@ -24,6 +24,7 @@ class PatientController extends BaseController
 
     private function set_site($site){
         $data = DB::table('facilitys')->select('ID')->where('facilitycode', $site)->orWhere('DHISCode', $site)->first();
+        return $data;
         echo "<pre>";print_r($data);die();
 		return [$data->id, 'facility'];
     }
@@ -190,6 +191,7 @@ class PatientController extends BaseController
 
     public function facility_suppression($site, $type, $year, $month=NULL, $year2=NULL, $month2=NULL){
         $div = $this->set_site($site);
+        print_r($div);die();
         return $this->get_current_suppression(4, $type, $year, $div, $month, $year2, $month2);
     }
 
