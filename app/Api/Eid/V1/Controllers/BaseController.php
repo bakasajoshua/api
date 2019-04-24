@@ -7,7 +7,7 @@ namespace App\Api\Eid\V1\Controllers;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
-
+use Carbon\Carbon;
 
 class BaseController extends Controller
 {
@@ -45,7 +45,7 @@ class BaseController extends Controller
 	}
 
 	protected function invalid_type($type){
-        $message = 'Type ' . $type . ' is invalid. Value must be between 1 and 4. 1 is for the total for the whole year. 2 is for the year with data grouped by month. 3 is for the a particular month. 4 for a particular quarter.';
+        $message = 'Type ' . $type . ' is invalid. Value must be between 1 and 5. 1 is for the total for the whole year. 2 is for the year with data grouped by month. 3 is for the a particular month. 4 for a particular quarter. 5 for a date range.';
         return $this->pass_error($message);
 	}
 
@@ -173,19 +173,25 @@ class BaseController extends Controller
 		  SUM(other) as other';
 	}
 
+
 	protected function age_breakdown_query(){
-		return 'SUM(nodatapos) as no_data_pos,
-		 SUM(nodataneg) as no_data_neg, 
-		 SUM(sixweekspos) as six_weeks_pos, 
-		 SUM(sixweeksneg) as six_weeks_neg, 
-		 SUM(sevento3mpos) as seven_to_3m_pos, 
-		 SUM(sevento3mneg) as seven_to_3m_neg, 
-		 SUM(threemto9mpos) as three_to_9m_pos, 
-		 SUM(threemto9mneg) as three_to_9m_neg, 
-		 SUM(ninemto18mpos) as nine_to_18m_pos, 
-		 SUM(ninemto18mneg) as nine_to_18m_neg, 
-		 SUM(above18mpos) as above_18m_pos, 
-		 SUM(above18mneg) as above_18m_neg';
+
+		return 'SUM(pos) as positives, 
+		 SUM(neg) as negatives,
+		  age_bands.name as age_range';
+
+		// return 'SUM(nodatapos) as no_data_pos,
+		//  SUM(nodataneg) as no_data_neg, 
+		//  SUM(sixweekspos) as six_weeks_pos, 
+		//  SUM(sixweeksneg) as six_weeks_neg, 
+		//  SUM(sevento3mpos) as seven_to_3m_pos, 
+		//  SUM(sevento3mneg) as seven_to_3m_neg, 
+		//  SUM(threemto9mpos) as three_to_9m_pos, 
+		//  SUM(threemto9mneg) as three_to_9m_neg, 
+		//  SUM(ninemto18mpos) as nine_to_18m_pos, 
+		//  SUM(ninemto18mneg) as nine_to_18m_neg, 
+		//  SUM(above18mpos) as above_18m_pos, 
+		//  SUM(above18mneg) as above_18m_neg';
 	}
 
 
@@ -241,14 +247,13 @@ class BaseController extends Controller
 		}
 	}
 
-	public function set_date($year, $month, $year2, $month2){
-		
+	public function set_date($year, $month, $year2, $month2)
+	{
 		$min = $year . '-' . $month . '-01';
 
-		$max = $year2 . '-' . ($month2+1) . '-01';
+		$max = Carbon::createFromFormat('Y-m-d', $year2 . '-' . ($month2+1) . '-01')->subDay()->toDateString();
 
 		return array($min, $max);
-
 	}
 
 	public function set_quarters($year, $quarter){
@@ -327,6 +332,27 @@ class BaseController extends Controller
 
 		return $value;
 
+	}
+
+	
+	public function set_date_range($type, $year, $month=0, $year2=0, $month2=0)
+	{
+		$dates = [];
+		if($type == 5){
+			if($year > $year2) return ['error' => 'From year is greater'];
+			if($year == $year2 && $month > $month2 ) return ['error' => 'From month is greater'];
+
+			$dates = $this->set_date($year, $month, $year2, $month2);
+		}
+		else if($type == 4) $dates = $this->set_quarters($year, $month);
+		else if($type == 3) $dates = $this->set_date($year, $month, $year, $month);
+		else if($type == 1) $dates = $this->set_date($year, 1, $year, 12);
+		else{
+	        $message = 'Type ' . $type . ' is invalid. Value must be between 1 and 5. 1 is for the total for the whole year. 2 is for the year with data grouped by month. 3 is for the a particular month. 4 for a particular quarter. 5 for a date range.';
+	        return ['error' => $message];
+		}
+
+		return " datetested BETWEEN '" . $dates[0] . "' AND '" . $dates[1] . "' ";
 	}
 
 }

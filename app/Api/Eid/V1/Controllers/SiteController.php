@@ -12,6 +12,18 @@ class SiteController extends BaseController
 {
     //
 
+	private function get_when_callback($site, $key, $order_column)
+	{
+		return function($query) use ($site, $key, $order_column){
+				if($site != "0" || $site != 0){
+					return $query->where($key, $site);
+				}
+				else{
+					return $query->orderBy($order_column)->limit(100);
+				}					
+			};
+	}
+
     private function set_key($site){
     	if(is_numeric($site)){
 			return "facilitys.facilitycode"; 
@@ -81,14 +93,7 @@ class SiteController extends BaseController
 			->select('year', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-				else{
-					return $query->orderBy('all_tests')->limit(100);
-				}					
-			})
+			->when($site, $this->get_when_callback($site, $key, 'all_tests'))
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
 			->get();
 
@@ -100,14 +105,7 @@ class SiteController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-				else{
-					return $query->orderBy('all_tests')->limit(100);
-				}					
-			})
+			->when($site, $this->get_when_callback($site, $key, 'all_tests'))
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
 			->get();
@@ -121,14 +119,7 @@ class SiteController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-				else{
-					return $query->orderBy('all_tests')->limit(100);
-				}					
-			})
+			->when($site, $this->get_when_callback($site, $key, 'all_tests'))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
@@ -149,14 +140,7 @@ class SiteController extends BaseController
 			->select('year', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-				else{
-					return $query->orderBy('all_tests')->limit(100);
-				}					
-			})
+			->when($site, $this->get_when_callback($site, $key, 'all_tests'))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
@@ -188,11 +172,7 @@ class SiteController extends BaseController
 				->select('year', DB::raw($raw))
 				->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 				->where('year', $year)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key, 'all_tests'))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 				->get();
@@ -203,11 +183,7 @@ class SiteController extends BaseController
 				->select( DB::raw($raw))
 				->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 				->whereRaw($q)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key, 'all_tests'))
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode')
 				->get();
 
@@ -248,13 +224,7 @@ class SiteController extends BaseController
 			$data = DB::table('site_summary')
 			->select('year', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
-			->when($site, function($query) use ($site){
-				if($site != 0) return $query->where('facilitys.ID', $site);
-
-				else{
-					return $query->orderBy('lost_to_follow_up')->limit(100);
-				}
-			})
+			->when($site, $this->get_when_callback($site, $key, 'lost_to_follow_up'))
 			->where('year', $year)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
 			->get();
@@ -267,13 +237,7 @@ class SiteController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site){
-				if($site != 0) return $query->where('facilitys.ID', $site);
-
-				else{
-					return $query->orderBy('lost_to_follow_up')->limit(100);
-				}
-			})
+			->when($site, $this->get_when_callback($site, $key, 'lost_to_follow_up'))
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
 			->get();
@@ -287,13 +251,7 @@ class SiteController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site){
-				if($site != 0) return $query->where('facilitys.ID', $site);
-
-				else{
-					return $query->orderBy('lost_to_follow_up')->limit(100);
-				}
-			})
+			->when($site, $this->get_when_callback($site, $key, 'lost_to_follow_up'))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
@@ -314,13 +272,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->select('year', DB::raw($raw))
 			->where('year', $year)
-			->when($site, function($query) use ($site){
-				if($site != 0) return $query->where('facilitys.ID', $site);
-
-				else{
-					return $query->orderBy('lost_to_follow_up')->limit(100);
-				}
-			})
+			->when($site, $this->get_when_callback($site, $key, 'lost_to_follow_up'))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
@@ -352,11 +304,7 @@ class SiteController extends BaseController
 				->select('year', DB::raw($raw))
 				->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 				->where('year', $year)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key, 'lost_to_follow_up'))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 				->get();
@@ -368,11 +316,7 @@ class SiteController extends BaseController
 				->select( DB::raw($raw))
 				->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 				->whereRaw($q)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key, 'lost_to_follow_up'))
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode')
 				->get();
 
@@ -413,13 +357,7 @@ class SiteController extends BaseController
 			$data = DB::table('site_summary')
 			->select('year', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
-			->when($site, function($query) use ($site){
-				if($site != 0) return $query->where('facilitys.ID', $site);
-
-				else{
-					return $query->orderBy('confirmed_pos')->limit(100);
-				}
-			})
+			->when($site, $this->get_when_callback($site, $key, 'confirmed_pos'))
 			->where('year', $year)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
 			->get();
@@ -432,13 +370,7 @@ class SiteController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site){
-				if($site != 0) return $query->where('facilitys.ID', $site);
-
-				else{
-					return $query->orderBy('confirmed_pos')->limit(100);
-				}
-			})
+			->when($site, $this->get_when_callback($site, $key, 'confirmed_pos'))
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
 			->get();
@@ -452,13 +384,7 @@ class SiteController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site){
-				if($site != 0) return $query->where('facilitys.ID', $site);
-
-				else{
-					return $query->orderBy('confirmed_pos')->limit(100);
-				}
-			})
+			->when($site, $this->get_when_callback($site, $key, 'confirmed_pos'))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
@@ -479,13 +405,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 			->select('year', DB::raw($raw))
 			->where('year', $year)
-			->when($site, function($query) use ($site){
-				if($site != 0) return $query->where('facilitys.ID', $site);
-
-				else{
-					return $query->orderBy('confirmed_pos')->limit(100);
-				}
-			})
+			->when($site, $this->get_when_callback($site, $key, 'confirmed_pos'))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.facilitycode', 'facilitys.DHIScode', 'year')
@@ -517,11 +437,7 @@ class SiteController extends BaseController
 				->select('year', DB::raw($raw))
 				->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 				->where('year', $year)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key, 'confirmed_pos'))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 				->get();
@@ -532,11 +448,7 @@ class SiteController extends BaseController
 				->select( DB::raw($raw))
 				->join('facilitys', 'facilitys.ID', '=', 'site_summary.facility')
 				->whereRaw($q)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key, 'confirmed_pos'))
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode')
 				->get();
 

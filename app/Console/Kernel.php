@@ -22,6 +22,9 @@ class Kernel extends ConsoleKernel
         Commands\VlReport::class,
 
         Commands\SendReport::class,
+
+        
+        Commands\MiscellaneousCommand::class,
     ];
 
     /**

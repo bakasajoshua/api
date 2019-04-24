@@ -11,6 +11,18 @@ class SiteController extends BaseController
 {
     
 
+	private function get_when_callback($site, $key)
+	{
+		return function($query) use ($site, $key){
+				if($site != "0" || $site != 0){
+					return $query->where($key, $site);
+				}
+				else{
+					// return $query->orderBy($order_column)->limit(100);
+				}					
+			};
+	}
+
     private function set_key($site){
     	if(is_numeric($site)){
 			return "facilitys.facilitycode"; 
@@ -78,12 +90,7 @@ class SiteController extends BaseController
 			->select('year', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 			->get();
 
@@ -95,12 +102,7 @@ class SiteController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 			->get();
@@ -114,12 +116,7 @@ class SiteController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -140,12 +137,7 @@ class SiteController extends BaseController
 			->select('year', DB::raw($raw))
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_summary.facility')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -178,11 +170,7 @@ class SiteController extends BaseController
 				->join('facilitys', 'facilitys.ID', '=', 'vl_site_summary.facility')
 				->where('year', $year)
 				->where('tat4', '!=', 0)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -194,11 +182,7 @@ class SiteController extends BaseController
 				->select( DB::raw($raw))
 				->join('facilitys', 'facilitys.ID', '=', 'vl_site_summary.facility')
 				->whereRaw($q)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key))
 				->where('tat4', '!=', 0)
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode')
 				->get();
@@ -242,12 +226,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_regimen.facility')
 			->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_site_regimen.regimen')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 			->groupBy('viralprophylaxis.name')
 			->get();
@@ -261,12 +240,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_regimen.facility')
 			->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_site_regimen.regimen')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 			->groupBy('viralprophylaxis.name')
@@ -282,12 +256,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_regimen.facility')
 			->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_site_regimen.regimen')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -310,12 +279,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_regimen.facility')
 			->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_site_regimen.regimen')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -349,11 +313,7 @@ class SiteController extends BaseController
 				->join('facilitys', 'facilitys.ID', '=', 'vl_site_regimen.facility')
 				->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_site_regimen.regimen')
 				->where('year', $year)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -367,11 +327,7 @@ class SiteController extends BaseController
 				->join('facilitys', 'facilitys.ID', '=', 'vl_site_regimen.facility')
 				->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_site_regimen.regimen')
 				->whereRaw($q)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key))
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode')
 				->groupBy('viralprophylaxis.name')
 				->get();
@@ -415,12 +371,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_gender.facility')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_site_gender.gender')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 			->groupBy('gender.name')
 			->get();
@@ -434,12 +385,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_gender.facility')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_site_gender.gender')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 			->groupBy('gender.name')
@@ -455,12 +401,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_gender.facility')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_site_gender.gender')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -483,12 +424,7 @@ class SiteController extends BaseController
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_gender.facility')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_site_gender.gender')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -522,11 +458,7 @@ class SiteController extends BaseController
 				->join('facilitys', 'facilitys.ID', '=', 'vl_site_gender.facility')
 				->leftJoin('gender', 'gender.ID', '=', 'vl_site_gender.gender')
 				->where('year', $year)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -540,18 +472,14 @@ class SiteController extends BaseController
 				->join('facilitys', 'facilitys.ID', '=', 'vl_site_gender.facility')
 				->leftJoin('gender', 'gender.ID', '=', 'vl_site_gender.gender')
 				->whereRaw($q)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key))
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode')
 				->groupBy('gender.name')
 				->get();
 
 				
 			}
-$desc = $this->describe_multiple($year, $month, $year2, $month2);
+			$desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 			for ($i=0; $i < sizeof($d); $i++) { 
 				$data[$i]['Period'] = $desc;
@@ -588,12 +516,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_age.facility')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_site_age.age')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 			->groupBy('agecategory.name')
 			->get();
@@ -607,12 +530,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_age.facility')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_site_age.age')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
 			->groupBy('agecategory.name')
@@ -628,12 +546,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_age.facility')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_site_age.age')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -656,12 +569,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->join('facilitys', 'facilitys.ID', '=', 'vl_site_age.facility')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_site_age.age')
 			->where('year', $year)
-			->when($site, function($query) use ($site, $key){
-				if($site != "0" || $site != 0){
-					return $query->where($key, $site);
-				}
-					
-			})
+			->when($site, $this->get_when_callback($site, $key))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -695,11 +603,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->join('facilitys', 'facilitys.ID', '=', 'vl_site_age.facility')
 				->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_site_age.age')
 				->where('year', $year)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode', 'year')
@@ -713,18 +617,14 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->join('facilitys', 'facilitys.ID', '=', 'vl_site_age.facility')
 				->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_site_age.age')
 				->whereRaw($q)
-				->when($site, function($query) use ($site, $key){
-					if($site != "0" || $site != 0){
-						return $query->where($key, $site);
-					}
-				})
+				->when($site, $this->get_when_callback($site, $key))
 				->groupBy('facilitys.ID', 'facilitys.name', 'facilitys.DHISCode', 'facilitys.facilitycode')
 				->groupBy('agecategory.name')
 				->get();
 
 				
 			}
-$desc = $this->describe_multiple($year, $month, $year2, $month2);
+			$desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 			for ($i=0; $i < sizeof($d); $i++) { 
 				$data[$i]['Period'] = $desc;

@@ -12,6 +12,13 @@ class PartnerController extends BaseController
 {
     //
 
+	private function get_when_callback($partner)
+	{
+		return function($query) use ($partner){
+				if($partner != 0) return $query->where('partners.ID', $partner);
+			};
+	}
+
     
     public function partners(){
     	return DB::table('partners')->orderBy('ID')->get();
@@ -34,11 +41,7 @@ class PartnerController extends BaseController
 			->select('year', DB::raw($raw))
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_summary.partner')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->groupBy('partners.ID', 'partners.name', 'year')
 			->get();
 
@@ -50,12 +53,7 @@ class PartnerController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_summary.partner')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->groupBy('month')
 			->groupBy('partners.ID', 'partners.name', 'year')
 			->get();
@@ -69,12 +67,7 @@ class PartnerController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_summary.partner')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('partners.ID', 'partners.name', 'year')
@@ -95,12 +88,7 @@ class PartnerController extends BaseController
 			->select('year', DB::raw($raw))
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_summary.partner')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('partners.ID', 'partners.name', 'year')
@@ -133,11 +121,7 @@ class PartnerController extends BaseController
 				->leftJoin('partners', 'partners.ID', '=', 'vl_partner_summary.partner')
 				->where('year', $year)
 				->where('tat4', '!=', 0)
-				->when($partner, function($query) use ($partner){
-					if($partner != "0" || $partner != 0){
-						return $query->where('partners.ID', $partner);
-					}
-				})
+				->when($partner, $this->get_when_callback($partner))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('partners.ID', 'partners.name', 'year')
@@ -149,18 +133,14 @@ class PartnerController extends BaseController
 				->select( DB::raw($raw))
 				->leftJoin('partners', 'partners.ID', '=', 'vl_partner_summary.partner')
 				->whereRaw($q)
-				->when($partner, function($query) use ($partner){
-					if($partner != "0" || $partner != 0){
-						return $query->where('partners.ID', $partner);
-					}
-				})
+				->when($partner, $this->get_when_callback($partner))
 				->where('tat4', '!=', 0)
 				->groupBy('partners.ID', 'partners.name')
 				->get();
 
 				
 			}
-$desc = $this->describe_multiple($year, $month, $year2, $month2);
+			$desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 			for ($i=0; $i < sizeof($d); $i++) { 
 				$data[$i]['Period'] = $desc;
@@ -196,11 +176,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->select('year', DB::raw($raw))
 			->leftJoin('viraljustifications', 'viraljustifications.ID', '=', 'vl_partner_justification.justification')
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_justification.partner')
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('year', $year)
 			->groupBy('partners.ID', 'partners.name', 'year')
 			->groupBy('viraljustifications.name')
@@ -214,11 +190,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->select('year', 'month', DB::raw($raw))
 			->leftJoin('viraljustifications', 'viraljustifications.ID', '=', 'vl_partner_justification.justification')
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_justification.partner')
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('year', $year)
 			->groupBy('month')
 			->groupBy('partners.ID', 'partners.name', 'year')
@@ -234,11 +206,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->select('year', 'month', DB::raw($raw))
 			->leftJoin('viraljustifications', 'viraljustifications.ID', '=', 'vl_partner_justification.justification')
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_justification.partner')
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('year', $year)
 			->where('month', $month)
 			->groupBy('month')
@@ -261,11 +229,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->select('year', DB::raw($raw))
 			->leftJoin('viraljustifications', 'viraljustifications.ID', '=', 'vl_partner_justification.justification')
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_justification.partner')
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('year', $year)
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
@@ -299,11 +263,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->select('year', DB::raw($raw))
 				->leftJoin('viraljustifications', 'viraljustifications.ID', '=', 'vl_partner_justification.justification')
 				->leftJoin('partners', 'partners.ID', '=', 'vl_partner_justification.partner')
-				->when($partner, function($query) use ($partner){
-					if($partner != "0" || $partner != 0){
-						return $query->where('partners.ID', $partner);
-					}
-				})
+				->when($partner, $this->get_when_callback($partner))
 				->where('year', $year)
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
@@ -317,18 +277,14 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->select( DB::raw($raw))
 				->leftJoin('viraljustifications', 'viraljustifications.ID', '=', 'vl_partner_justification.justification')
 				->leftJoin('partners', 'partners.ID', '=', 'vl_partner_justification.partner')
-				->when($partner, function($query) use ($partner){
-					if($partner != "0" || $partner != 0){
-						return $query->where('partners.ID', $partner);
-					}
-				})
+				->when($partner, $this->get_when_callback($partner))
 				->whereRaw($q)
 				->groupBy('viraljustifications.name')
 				->groupBy('partners.ID', 'partners.name')
 				->get();
 			}
 			
-$desc = $this->describe_multiple($year, $month, $year2, $month2);
+			$desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 			for ($i=0; $i < sizeof($d); $i++) { 
 				$data[$i]['Period'] = $desc;
@@ -363,12 +319,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_gender.partner')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_partner_gender.gender')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->groupBy('partners.ID', 'partners.name', 'year')
 			->groupBy('gender.name')
 			->get();
@@ -382,12 +333,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_gender.partner')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_partner_gender.gender')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->groupBy('month')
 			->groupBy('partners.ID', 'partners.name', 'year')
 			->groupBy('gender.name')
@@ -403,12 +349,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_gender.partner')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_partner_gender.gender')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('partners.ID', 'partners.name', 'year')
@@ -431,12 +372,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_gender.partner')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_partner_gender.gender')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('partners.ID', 'partners.name', 'year')
@@ -470,11 +406,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('partners', 'partners.ID', '=', 'vl_partner_gender.partner')
 				->leftJoin('gender', 'gender.ID', '=', 'vl_partner_gender.gender')
 				->where('year', $year)
-				->when($partner, function($query) use ($partner){
-					if($partner != "0" || $partner != 0){
-						return $query->where('partners.ID', $partner);
-					}
-				})
+				->when($partner, $this->get_when_callback($partner))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('partners.ID', 'partners.name', 'year')
@@ -487,12 +419,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->select( DB::raw($raw))
 				->leftJoin('partners', 'partners.ID', '=', 'vl_partner_gender.partner')
 				->leftJoin('gender', 'gender.ID', '=', 'vl_partner_gender.gender')
-				->when($partner, function($query) use ($partner){
-					if($partner != "0" || $partner != 0){
-						return $query->where('partners.ID', $partner);
-					}
-						
-				})
+				->when($partner, $this->get_when_callback($partner))
 				->whereRaw($q)
 				->groupBy('partners.ID', 'partners.name')
 				->groupBy('gender.name')
@@ -500,7 +427,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 				
 			}
-$desc = $this->describe_multiple($year, $month, $year2, $month2);
+			$desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 			for ($i=0; $i < sizeof($d); $i++) { 
 				$data[$i]['Period'] = $desc;
@@ -537,12 +464,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_age.partner')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_partner_age.age')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->groupBy('partners.ID', 'partners.name', 'year')
 			->groupBy('agecategory.name')
 			->get();
@@ -556,12 +478,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_age.partner')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_partner_age.age')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->groupBy('month')
 			->groupBy('partners.ID', 'partners.name', 'year')
 			->groupBy('agecategory.name')
@@ -577,12 +494,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_age.partner')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_partner_age.age')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('partners.ID', 'partners.name', 'year')
@@ -605,12 +517,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('partners', 'partners.ID', '=', 'vl_partner_age.partner')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_partner_age.age')
 			->where('year', $year)
-			->when($partner, function($query) use ($partner){
-				if($partner != "0" || $partner != 0){
-					return $query->where('partners.ID', $partner);
-				}
-					
-			})
+			->when($partner, $this->get_when_callback($partner))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('partners.ID', 'partners.name', 'year')
@@ -644,11 +551,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('partners', 'partners.ID', '=', 'vl_partner_age.partner')
 				->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_partner_age.age')
 				->where('year', $year)
-				->when($partner, function($query) use ($partner){
-					if($partner != "0" || $partner != 0){
-						return $query->where('partners.ID', $partner);
-					}
-				})
+				->when($partner, $this->get_when_callback($partner))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('partners.ID', 'partners.name', 'year')
@@ -662,11 +565,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('partners', 'partners.ID', '=', 'vl_partner_age.partner')
 				->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_partner_age.age')
 				->whereRaw($q)
-				->when($partner, function($query) use ($partner){
-					if($partner != "0" || $partner != 0){
-						return $query->where('partners.ID', $partner);
-					}
-				})
+				->when($partner, $this->get_when_callback($partner))
 				->groupBy('partners.ID', 'partners.name')
 				->groupBy('agecategory.name')
 				->get();

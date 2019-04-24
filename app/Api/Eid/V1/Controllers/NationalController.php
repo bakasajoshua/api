@@ -377,21 +377,23 @@ class NationalController extends BaseController
 		// Totals for the whole year
 		if($type == 1){
 
-			$data = DB::table('national_agebreakdown')
+			$data = DB::table('national_age_breakdown')
+			->leftJoin('age_bands', 'age_bands.ID', '=', 'national_age_breakdown.age_band_id')
 			->select('year', DB::raw($raw))
 			->where('year', $year)
-			->groupBy('year')
+			->groupBy('year', 'name')
 			->get();
 
 		}
 
 		// For the whole year but has per month
 		else if($type == 2){
-			$data = DB::table('national_agebreakdown')
+			$data = DB::table('national_age_breakdown')
+			->leftJoin('age_bands', 'age_bands.ID', '=', 'national_age_breakdown.age_band_id')
 			->select('year', 'month', DB::raw($raw))
 			->where('year', $year)
 			->groupBy('month')
-			->groupBy('year')
+			->groupBy('year', 'name')
 			->get();
 		}
 
@@ -399,12 +401,13 @@ class NationalController extends BaseController
 		else if($type == 3){
 
 			if($month < 1 || $month > 12) return $this->invalid_month($month);
-			$data = DB::table('national_agebreakdown')
+			$data = DB::table('national_age_breakdown')
+			->leftJoin('age_bands', 'age_bands.ID', '=', 'national_age_breakdown.age_band_id')
 			->select('year', 'month', DB::raw($raw))
 			->where('year', $year)
 			->where('month', $month)
 			->groupBy('month')
-			->groupBy('year')
+			->groupBy('year', 'name')
 			->get();
 		}
 
@@ -418,12 +421,13 @@ class NationalController extends BaseController
 			$lesser = $my_range[0];
 			$greater = $my_range[1];
 
-			$d = DB::table('national_agebreakdown')
+			$d = DB::table('national_age_breakdown')
+			->leftJoin('age_bands', 'age_bands.ID', '=', 'national_age_breakdown.age_band_id')
 			->select('year', DB::raw($raw))
 			->where('year', $year)
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
-			->groupBy('year')
+			->groupBy('year', 'name')
 			->get();
 			
 			$a = "Q" . $month;
@@ -448,16 +452,18 @@ class NationalController extends BaseController
 			// return $this->pass_error($q);
 
 			if($year == $year2 && $month < $month2){
-				$d = DB::table('national_agebreakdown')
+				$d = DB::table('national_age_breakdown')
+				->leftJoin('age_bands', 'age_bands.ID', '=', 'national_age_breakdown.age_band_id')
 				->select('year', DB::raw($raw))
 				->where('year', $year)
 				->whereBetween('month', [$month, $month2])
-				->groupBy('year')
+				->groupBy('year', 'name')
 				->get();
 			}
 
 			if($year < $year2){
-				$d = DB::table('national_agebreakdown')
+				$d = DB::table('national_age_breakdown')
+				->leftJoin('age_bands', 'age_bands.ID', '=', 'national_age_breakdown.age_band_id')
 				->select( DB::raw($raw))
 				->whereRaw($q)
 				->get();

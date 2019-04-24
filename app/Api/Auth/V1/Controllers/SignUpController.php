@@ -9,7 +9,9 @@ use App\UserType;
 use JWTAuth;
 use App\Http\Controllers\Controller;
 use App\Api\Auth\V1\Requests\SignUpRequest;
+use App\Api\Auth\V1\Requests\EditUserRequest;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class SignUpController extends Controller
@@ -54,6 +56,23 @@ class SignUpController extends Controller
             return UserType::all();
         }
         throw new AccessDeniedHttpException();
+    }
+
+    public function profile(EditUserRequest $request, JWTAuth $JWTAuth)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+
+        $duplicate = User::where('email', $request->input('email'))->where('id', '!=', $user->id)->get()->first();
+
+        if($duplicate){
+            throw new Symfony\Component\HttpKernel\Exception\ConflictHttpException('The email address is unavailable.');
+        }
+
+
+        $user->email = $request->input('email');
+        $user->password = $request->input('password');
+        $user->save();
+        return ['email' => $user->email, 'password' => $request->input('password')];
     }
 
     public function test(){

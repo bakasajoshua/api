@@ -11,6 +11,15 @@ class SubcountyController extends BaseController
 {
     //
 
+	private function get_when_callback($subcounty, $key)
+	{
+		return function($query) use ($subcounty, $key){
+				if($subcounty != "0" || $subcounty != 0){
+					return $query->where($key, $subcounty);
+				}					
+			};
+	}
+
     
 
 	private function set_key($subcounty){
@@ -45,12 +54,7 @@ class SubcountyController extends BaseController
 			->select('year', DB::raw($raw))
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_summary.subcounty')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
 			->get();
 
@@ -62,12 +66,7 @@ class SubcountyController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_summary.subcounty')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->groupBy('month')
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
 			->get();
@@ -81,12 +80,7 @@ class SubcountyController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_summary.subcounty')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -107,12 +101,7 @@ class SubcountyController extends BaseController
 			->select('year', DB::raw($raw))
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_summary.subcounty')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -145,11 +134,7 @@ class SubcountyController extends BaseController
 				->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_summary.subcounty')
 				->where('year', $year)
 				->where('tat4', '!=', 0)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($subcounty, $this->get_when_callback($subcounty, $key))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -161,18 +146,14 @@ class SubcountyController extends BaseController
 				->select( DB::raw($raw))
 				->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_summary.subcounty')
 				->whereRaw($q)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($subcounty, $this->get_when_callback($subcounty, $key))
 				->where('tat4', '!=', 0)
 				->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode')
 				->get();
 
 				
 			}
-$desc = $this->describe_multiple($year, $month, $year2, $month2);
+			$desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 			for ($i=0; $i < sizeof($d); $i++) { 
 				$data[$i]['Period'] = $desc;
@@ -209,12 +190,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_regimen.subcounty')
 			->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_subcounty_regimen.regimen')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
 			->groupBy('viralprophylaxis.name')
 			->get();
@@ -228,12 +204,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_regimen.subcounty')
 			->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_subcounty_regimen.regimen')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->groupBy('month')
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
 			->groupBy('viralprophylaxis.name')
@@ -249,12 +220,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_regimen.subcounty')
 			->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_subcounty_regimen.regimen')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -277,12 +243,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_regimen.subcounty')
 			->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_subcounty_regimen.regimen')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -316,11 +277,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_regimen.subcounty')
 				->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_subcounty_regimen.regimen')
 				->where('year', $year)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($subcounty, $this->get_when_callback($subcounty, $key))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -334,18 +291,14 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_regimen.subcounty')
 				->leftJoin('viralprophylaxis', 'viralprophylaxis.ID', '=', 'vl_subcounty_regimen.regimen')
 				->whereRaw($q)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($subcounty, $this->get_when_callback($subcounty, $key))
 				->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode')
 				->groupBy('viralprophylaxis.name')
 				->get();
 
 				
 			}
-$desc = $this->describe_multiple($year, $month, $year2, $month2);
+			$desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 			for ($i=0; $i < sizeof($d); $i++) { 
 				$data[$i]['Period'] = $desc;
@@ -382,12 +335,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_gender.subcounty')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_subcounty_gender.gender')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
 			->groupBy('gender.name')
 			->get();
@@ -401,12 +349,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_gender.subcounty')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_subcounty_gender.gender')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->groupBy('month')
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
 			->groupBy('gender.name')
@@ -422,12 +365,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_gender.subcounty')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_subcounty_gender.gender')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -450,12 +388,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_gender.subcounty')
 			->leftJoin('gender', 'gender.ID', '=', 'vl_subcounty_gender.gender')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -489,11 +422,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_gender.subcounty')
 				->leftJoin('gender', 'gender.ID', '=', 'vl_subcounty_gender.gender')
 				->where('year', $year)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($subcounty, $this->get_when_callback($subcounty, $key))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -507,18 +436,14 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_gender.subcounty')
 				->leftJoin('gender', 'gender.ID', '=', 'vl_subcounty_gender.gender')
 				->whereRaw($q)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($subcounty, $this->get_when_callback($subcounty, $key))
 				->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode')
 				->groupBy('gender.name')
 				->get();
 
 				
 			}
-$desc = $this->describe_multiple($year, $month, $year2, $month2);
+			$desc = $this->describe_multiple($year, $month, $year2, $month2);
 
 			for ($i=0; $i < sizeof($d); $i++) { 
 				$data[$i]['Period'] = $desc;
@@ -555,12 +480,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_age.subcounty')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_subcounty_age.age')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
 			->groupBy('agecategory.name')
 			->get();
@@ -574,12 +494,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_age.subcounty')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_subcounty_age.age')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->groupBy('month')
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
 			->groupBy('agecategory.name')
@@ -595,12 +510,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_age.subcounty')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_subcounty_age.age')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -623,12 +533,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 			->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_age.subcounty')
 			->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_subcounty_age.age')
 			->where('year', $year)
-			->when($subcounty, function($query) use ($subcounty, $key){
-				if($subcounty != "0" || $subcounty != 0){
-					return $query->where($key, $subcounty);
-				}
-					
-			})
+			->when($subcounty, $this->get_when_callback($subcounty, $key))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -662,11 +567,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_age.subcounty')
 				->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_subcounty_age.age')
 				->where('year', $year)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($subcounty, $this->get_when_callback($subcounty, $key))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('year')
 				->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode', 'year')
@@ -680,11 +581,7 @@ $desc = $this->describe_multiple($year, $month, $year2, $month2);
 				->leftJoin('districts', 'districts.ID', '=', 'vl_subcounty_age.subcounty')
 				->leftJoin('agecategory', 'agecategory.ID', '=', 'vl_subcounty_age.age')
 				->whereRaw($q)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($subcounty, $this->get_when_callback($subcounty, $key))
 				->groupBy('districts.ID', 'districts.name', 'districts.subcountyDHISCode', 'districts.subcountyMFLCode')
 				->groupBy('agecategory.name')
 				->get();

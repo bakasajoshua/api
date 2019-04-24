@@ -12,6 +12,13 @@ class LabController extends BaseController
 {
     //
 
+	private function get_when_callback($lab)
+	{
+		return function($query) use ($lab){
+				if($lab != 0) return $query->where('labs.ID', $lab);
+			};
+	}
+
     public function labs(){
     	return DB::table('labs')->orderBy('ID')->get();
     }
@@ -35,9 +42,7 @@ class LabController extends BaseController
 			->select('year', DB::raw($raw))
 			->leftJoin('labs', 'labs.ID', '=', 'lab_summary.lab')
 			->where('year', $year)
-			->when($lab, function($query) use ($lab){
-				if($lab != 0) return $query->where('labs.ID', $lab);
-			})
+			->when($lab, $this->get_when_callback($lab))
 			->groupBy('labs.ID', 'labs.name', 'year')
 			->get();
 
@@ -49,9 +54,7 @@ class LabController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->leftJoin('labs', 'labs.ID', '=', 'lab_summary.lab')
 			->where('year', $year)
-			->when($lab, function($query) use ($lab){
-				if($lab != 0) return $query->where('labs.ID', $lab);
-			})
+			->when($lab, $this->get_when_callback($lab))
 			->groupBy('month')
 			->groupBy('labs.ID', 'labs.name', 'year')
 			->get();
@@ -65,9 +68,7 @@ class LabController extends BaseController
 			->select('year', 'month', DB::raw($raw))
 			->leftJoin('labs', 'labs.ID', '=', 'lab_summary.lab')
 			->where('year', $year)
-			->when($lab, function($query) use ($lab){
-				if($lab != 0) return $query->where('labs.ID', $lab);
-			})
+			->when($lab, $this->get_when_callback($lab))
 			->where('month', $month)
 			->groupBy('month')
 			->groupBy('labs.ID', 'labs.name', 'year')
@@ -88,9 +89,7 @@ class LabController extends BaseController
 			->select('year', DB::raw($raw))
 			->leftJoin('labs', 'labs.ID', '=', 'lab_summary.lab')
 			->where('year', $year)
-			->when($lab, function($query) use ($lab){
-				if($lab != 0) return $query->where('labs.ID', $lab);
-			})
+			->when($lab, $this->get_when_callback($lab))
 			->where('month', '>', $lesser)
 			->where('month', '<', $greater)
 			->groupBy('labs.ID', 'labs.name', 'year')
@@ -124,11 +123,7 @@ class LabController extends BaseController
 				->select('year', DB::raw($raw))
 				->leftJoin('labs', 'labs.ID', '=', 'lab_summary.lab')
 				->where('year', $year)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($lab, $this->get_when_callback($lab))
 				->whereBetween('month', [$month, $month2])
 				->groupBy('labs.ID', 'labs.name', 'year')
 				->get();
@@ -139,11 +134,7 @@ class LabController extends BaseController
 				->select( DB::raw($raw))
 				->leftJoin('labs', 'labs.ID', '=', 'lab_summary.lab')
 				->whereRaw($q)
-				->when($subcounty, function($query) use ($subcounty, $key){
-					if($subcounty != "0" || $subcounty != 0){
-						return $query->where($key, $subcounty);
-					}
-				})
+				->when($lab, $this->get_when_callback($lab))
 				->groupBy('labs.ID', 'labs.name')
 				->get();
 

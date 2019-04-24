@@ -22,7 +22,7 @@ class User extends Authenticatable
      *
      * @var string
      */
-    protected $table = "mysql_write";
+    protected $connection = "mysql_write";
 
 
     /**

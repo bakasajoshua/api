@@ -63,7 +63,6 @@ class ReportController extends BaseController
     }
 
 
-
     public function county_report($county, $year=null, $month=null){
     	if($year==null){
     		$year = Date('Y');

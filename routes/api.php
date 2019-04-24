@@ -14,7 +14,11 @@ $api->version('v1', function (Router $api) {
             $api->group(['middleware' => 'jwt.auth'], function(Router $api) {
                 $api->get('users', 'SignUpController@users');
                 $api->get('user_types', 'SignUpController@user_types');
+
+                $api->post('profile', 'SignUpController@profile');
             });
+
+
 
             $api->post('signup', 'SignUpController@signUp');
             $api->post('login', 'LoginController@login');
@@ -197,6 +201,20 @@ $api->group(['prefix' => 'eid'], function(Router $api) {
             $api->get('partner/{site}/{type}/{pcrtype}/{age}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@partner_tests2');
 
         });
+
+        $api->group(['prefix' => 'patient3'], function(Router $api) {
+
+            $api->get('national/{type}/{pcrtype}/{age_lower}/{age_upper}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@national_tests3');
+
+            $api->get('county/{county}/{type}/{pcrtype}/{age_lower}/{age_upper}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@county_tests3');
+
+            $api->get('subcounty/{subcounty}/{type}/{pcrtype}/{age_lower}/{age_upper}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@subcounty_tests3');
+
+            $api->get('facility/{site}/{type}/{pcrtype}/{age_lower}/{age_upper}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@facility_tests3');
+
+            $api->get('partner/{site}/{type}/{pcrtype}/{age_lower}/{age_upper}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@partner_tests3');
+
+        });
         
     });
 });
@@ -329,22 +347,24 @@ $api->group(['prefix' => 'vl'], function(Router $api) {
 
         $api->group(['prefix' => 'patient'], function(Router $api) {
             $api->group(['middleware' => 'jwt.auth'], function(Router $api) {
-
                 $api->get('results/{site}/{patientID}', 'PatientController@get_results')->where('patientID', '(.*)');
-
             });
 
             $api->get('viralloads', 'PatientController@viralloads');
 
             $api->get('national/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@national_viralloads');
-
             $api->get('county/{county}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@county_viralloads');
-
             $api->get('subcounty/{subcounty}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@subcounty_viralloads');
-
             $api->get('facility/{site}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@facility_viralloads');
+            $api->get('partner/{partner}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@partner_viralloads');
 
-            $api->get('partner/{site}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@partner_viralloads');
+            $api->group(['prefix' => 'suppression'], function(Router $api) {
+                $api->get('national/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@national_suppression');
+                $api->get('county/{county}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@county_suppression');
+                $api->get('subcounty/{subcounty}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@subcounty_suppression');
+                $api->get('facility/{site}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@facility_suppression');
+                $api->get('partner/{partner}/{type}/{year}/{month?}/{year2?}/{month2?}', 'PatientController@partner_suppression');
+            });
 
             $api->get('test', 'PatientController@test');
 
