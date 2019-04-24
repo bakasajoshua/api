@@ -24,7 +24,7 @@ class PatientController extends BaseController
 
     private function set_site($site){
         $data = DB::table('facilitys')->select('ID')->where('facilitycode', $site)->orWhere('DHISCode', $site)->first();
-        dd($data);
+        echo "<pre>";print_r($data);die();
 		return [$data->id, 'facility'];
     }
 
