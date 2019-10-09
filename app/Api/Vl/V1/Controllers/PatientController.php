@@ -24,7 +24,7 @@ class PatientController extends BaseController
 
     private function set_site($site){
         $data = DB::table('facilitys')->select('ID')->where('facilitycode', $site)->orWhere('DHISCode', $site)->first();
-		return [$data->ID, 'facility'];
+        return [$data->ID, 'facility'];
     }
 
     private function set_county($county){
