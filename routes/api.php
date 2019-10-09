@@ -36,6 +36,7 @@ $api->version('v1', function (Router $api) {
 // $api->group(['middleware' => 'api.throttle', 'limit' => 5, 'expires' => 1], function(Router $api) {
 
 $api->get('/', 'App\Http\Controllers\HomeController@home');
+$api->get('/rtk', 'App\Http\Controllers\HomeController@rtk');
 
 $api->group(['prefix' => 'eid'], function(Router $api) {
     $api->group(['prefix' => 'ver2.0', 'namespace' => 'App\\Api\\Eid\\V1\\Controllers'], function(Router $api) {
