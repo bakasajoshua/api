@@ -33,7 +33,7 @@ class HomeController extends Controller
                         return $query->where('view_facilitys.facilitycode', $request->input('facilitycode'));
                     })->when($request->has('month'), function($query) use ($request){
                         return $query->whereMonth('datetested', $request->input('month'));
-                    })->groupBy('facilityname')->orderBy('tests', 'desc')->selectRaw("view_facilitys.facilitycode,view_facilitys.name AS `facilityname`,COUNT($table.id) AS `tests`, YEAR($table.datetested) as `year`, MONTH($table.datetested) as `month`")->groupBy('month')->get();
+                    })->groupBy('facilityname')->orderBy('tests', 'desc')->selectRaw("view_facilitys.facilitycode,view_facilitys.name AS `facilityname`,COUNT($table.id) AS `tests`, YEAR($table.datetested) as `year`, MONTH($table.datetested) as `month`")->groupBy('month', 'asc')->get();
         } else {
             next:
             foreach ($this->testtypes as $key => $value) {
@@ -41,7 +41,7 @@ class HomeController extends Controller
                         return $query->where('view_facilitys.facilitycode', $request->input('facilitycode'));
                     })->when($request->has('month'), function($query) use ($request){
                         return $query->whereMonth('datetested', $request->input('month'));
-                    })->groupBy('facilitycode')->groupBy('facilityname')->orderBy('tests', 'desc')->selectRaw("view_facilitys.facilitycode,view_facilitys.name AS `facilityname`,COUNT({$value}.id) AS `tests`, YEAR($table.datetested) as `year`, MONTH($table.datetested) as `month`")->groupBy('month')->get();
+                    })->groupBy('facilitycode')->groupBy('facilityname')->orderBy('tests', 'desc')->selectRaw("view_facilitys.facilitycode,view_facilitys.name AS `facilityname`,COUNT({$value}.id) AS `tests`, YEAR($table.datetested) as `year`, MONTH($table.datetested) as `month`")->groupBy('month', 'asc')->get();
                 $return[$key]['test'] = $key;
                 $return[$key]['year'] = $year;
                 if ($request->has('month'))
