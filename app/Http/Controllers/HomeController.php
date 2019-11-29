@@ -27,9 +27,6 @@ class HomeController extends Controller
             $year = $request->input('year');
         if ($request->has('test')) {
             $testtype = strtolower($request->input('test'));
-            return response()->json($testtype);
-            if (!in_array($testtype, $this->testgroups))
-                return response()->json(['message' => 'You have provided an invalid test type for the request value of test. Ensure it is either vl or eid'], 400);
             if (!isset($this->testtypes[$testtype]))
                 goto next;
             $table = $this->testtypes[$testtype];
@@ -45,7 +42,7 @@ class HomeController extends Controller
                         return $query->where('view_facilitys.facilitycode', $request->input('facilitycode'));
                     })->when($request->has('month'), function($query) use ($request){
                         return $query->whereMonth('datetested', $request->input('month'));
-                    })->groupBy('facilitycode')->groupBy('facilityname')->orderBy('tests', 'desc')->selectRaw("view_facilitys.facilitycode,view_facilitys.name AS `facilityname`,COUNT({$value}.id) AS `tests`, YEAR($table.datetested) as `year`, MONTH($table.datetested) as `month`")->groupBy('month')->get();
+                    })->groupBy('facilitycode')->groupBy('facilityname')->orderBy('tests', 'desc')->selectRaw("view_facilitys.facilitycode,view_facilitys.name AS `facilityname`,COUNT({$value}.id) AS `tests`, YEAR($value.datetested) as `year`, MONTH($value.datetested) as `month`")->groupBy('month')->get();
                 $return[$key]['test'] = $key;
                 $return[$key]['year'] = $year;
                 if ($request->has('month'))
