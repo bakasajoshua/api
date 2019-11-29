@@ -27,6 +27,7 @@ class HomeController extends Controller
             $year = $request->input('year');
         if ($request->has('test')) {
             $testtype = strtolower($request->input('test'));
+            return response()->json($testtype);
             if (!in_array($testtype, $this->testgroups))
                 return response()->json(['message' => 'You have provided an invalid test type for the request value of test. Ensure it is either vl or eid'], 400);
             if (!isset($this->testtypes[$testtype]))
